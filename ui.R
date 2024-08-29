@@ -1,55 +1,67 @@
+## define directory
+setwd("C:\\Users\\Joao\\Documents\\Dev\\fogocruzado-dash/")
 
-#### Reference ####
-# Valid themes are: cerulean, cosmo, cyborg, darkly, 
-# flatly, journal, lumen, paper, 
-# readable, sandstone, simplex, slate, spacelab, 
-# superhero, united, yeti.
-# themeSelector()
-# https://cran.r-project.org/web/packages/shinythemes/shinythemes.pdf
-
-
-#### About shinythemes package ####
-# Themes for use with Shiny. Includes several Bootstrap themes
-# from <http://bootswatch.com/>, which are packaged for use with Shiny
-# applications.
-
-#### Install the shinythemes packages ####
-# install.packages("shinythemes")
+## read source
+source("data_generator.R")
 
 
 #### ShinyThemes Demo Code ####
 library(shiny)
 library(shinythemes)
-library(datasets)
+# library(datasets)
 
 shinyUI(fluidPage(
   theme=shinytheme("cosmo"),
   # themeSelector(), ## not required but can be used to select the theme
   
   navbarPage(
-    title="Dashboard ",
+    title="Dashboard Fogo Cruzado",
     id="nav",
-    tabPanel("Data", value="Data",
-             sidebarLayout(
-               sidebarPanel(
-                 selectInput(
-                   inputId = "state",
-                   label = "Select the State", 
-                   choices=choiceList
-                   ),
-                 tags$hr(),
-                 sliderInput("n", "Select no. of data rows", min = 2, max = 10, value=6)
-               ),
-               mainPanel(
-                 textOutput("value"),
-                 tableOutput("table")
-               #   tabsetPanel(
-               #     tabPanel("Dataset", tableOutput("table")),
-               #     tabPanel("Summary Stats", verbatimTextOutput("summary"))
-               #   )
-               )
-             )),
-    tabPanel("Plots", value="Plots")
+    tabPanel(
+      title = "Data", 
+      value="Data",
+      sidebarLayout(
+        sidebarPanel(
+           selectInput(
+             inputId = "state",
+             label = "Select the State", 
+             choices=states_list
+             ),
+           tags$hr(),
+           sliderInput("n", "Select no. of data rows", min = 2, max = 10, value=6)
+         ),
+         mainPanel(
+           tabsetPanel(
+             tabPanel("Data", tableOutput("table")),
+             tabPanel("Motivation", tableOutput("motivation_table"))
+             # textOutput("value")
+           )
+         )
+       )),
+    tabPanel(
+      title = "Plots", 
+      value = "Plots",
+      sidebarLayout(
+        sidebarPanel(
+          selectInput(
+            inputId = "state",
+            label = "Select the State", 
+            choices=states_list
+          ),
+          selectInput(
+            inputId = "motivation",
+            label = "Select the Motivation", 
+            choices=motiv_list
+          )
+        ),
+        mainPanel(
+          tabsetPanel(
+            tabPanel("Barplot", plotOutput("barplot")),
+            tabPanel("Map", textOutput("texting"))
+            # textOutput("value")
+          )
+        )
+      )
+      )
   )
-  
 ))

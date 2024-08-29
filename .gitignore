@@ -1,4 +1,10 @@
-app1.R
+# Still in progress
+mapping_work.R
 
 # Environment file
 .Renviron
+
+# Ignore map folder for now
+Rio*/
+
+.Rhistory

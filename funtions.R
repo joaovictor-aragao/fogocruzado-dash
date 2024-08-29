@@ -35,11 +35,15 @@ getStates <- function(base_url, token) {
     
     names(statedf) <- c("Id", "State")
     
-    return(statedf)
+    lstate <- statedf[, 1]
+    names(lstate) <- statedf[, 2]
+    
+    return(lstate)
     
   }
 }
 
+## get and filter the data returned
 getOccurances <- function(base_url, token, id_state) {
   occs <- httr::GET(
     url = paste0(base_url, "/occurrences?idState=", id_state),
@@ -63,6 +67,52 @@ getOccurances <- function(base_url, token, id_state) {
       )
     }
     
+    ## naming vars
+    names(ocss_list) <- c("State", "Latitude", "Longitute", "Date", "Motivation")
+    
+    ## modifying Date to the YYYY-MM-DD format
+    ocss_list$Date <- substr(ocss_list$Date, 1, 10)
+    occs$Date <- as.Date(occs$Date)
+    
     return(ocss_list)
   }
+}
+
+## creates a frequency table to categorical var
+tabFreqCat <- function(data, num_var) {
+  
+  tab <- as.data.frame(table(data[, num_var]))
+  tab <- tab[order(tab[, 2], decreasing = TRUE),]
+  tab$`n (%)` <- paste0(
+    tab[, 2], " (",
+    round(tab[, 2] / sum(tab[, 2], na.rm = TRUE) * 100, 1), "%)"
+  )
+  tab <- tab[, c(1, 3)]
+  names(tab)[1] <- c("")
+  
+  return(tab)
+}
+
+plotGen <- function(data, date_var, motiv_filter) {
+  
+  ## filter by motivation
+  if (motiv_filter == "All") {
+    filtering <- TRUE
+  } else {
+    filtering <- data[, 5] == motiv_filter
+  }
+  
+  df <- data %>% 
+    filter(filtering) %>% 
+    group_by(Date) %>%
+    summarise(count=n()) %>%
+    data.frame()
+  
+  print(filtering)
+  
+  return(
+    ggplot(data=df, aes(x=Date, y=count)) +
+    geom_bar(stat="identity", fill="steelblue")+
+    theme_minimal()
+    )
 }
